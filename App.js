@@ -18,7 +18,22 @@ import {
   useColorScheme,
   View,
   ActivityIndicator,
-} from 'react-native'
+} from 'react-native';
+import MainLayout from './src/layouts/MainLayout';
+import Pacientes from './src/pages/Pacientes';
+import Reservas from './src/pages/Reservas';
+import Fichas from './src/pages/Fichas';
+
+const Main = () => {
+  const [page, setPage] = useState('pacientes');
+  return(
+    <MainLayout onPageChange={ p => setPage(p) }>
+      {page === 'pacientes' && <Pacientes/>}
+      {page === 'reservas' && <Reservas/>}
+      {page === 'fichas' && <Fichas/>}
+    </MainLayout>
+  );
+}
 
 const App = () => {
   const [hasLogged, setHasLogged] = useState(false)
@@ -38,7 +53,7 @@ const App = () => {
       <StatusBar barStyle="light-content" />
       {
         loading ? <ActivityIndicator size="large" color="orange" /> :
-        hasLogged ? <Text>You are now logged! :D</Text> :
+        hasLogged ? <Main/> :
           <Login logged={_ => handleLogged()} /> 
       }
     </SafeAreaView>
