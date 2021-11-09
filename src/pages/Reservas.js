@@ -99,7 +99,10 @@ export default () => {
                         title="Buscar reservas"
                         color="orange"
                     />
-                    <ReservasList reservasList={reservasList} setError={setError} getReservas={getReservas} idCliente={selectedClient}/>
+                    <ReservasList reservasList={reservasList} setError={setError} 
+                        getReservas={getReservas} idCliente={selectedClient}
+                        strDate={formatDate(new Date())}
+                    />
                 </View>
             </>}
         </View>

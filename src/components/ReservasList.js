@@ -13,8 +13,11 @@ import {
     Button,
     FlatList
 } from 'react-native';
+import ReservasModal from './ReservasModal';
 
-export default ({reservasList, setError, getReservas, idCliente}) => {
+export default ({reservasList, setError, getReservas, idCliente, strDate}) => {
+    const [selectedReservaObj, setSelectedReservaObj] = useState(null);
+    const [modificarReservaModal, setModificarReservaModal] = useState(false);
     const reservar = async ({fechaCadena, horaInicioCadena, horaFinCadena, idEmpleado}, idCliente = 3) => {
         const body = JSON.stringify({
             fechaCadena,
@@ -50,11 +53,17 @@ export default ({reservasList, setError, getReservas, idCliente}) => {
         }
 
     }
-    const modificarReserva = async() => {
-        
+    const modificarReserva = async(reserva) => {
+        setSelectedReservaObj(reserva);
+        setModificarReservaModal(true);
     }
     const renderItem = ({item}) => ( 
         <View style={styles.reservasListItem}>
+            <View style={styles.modal}>
+                <ReservasModal setModalVisible={setModificarReservaModal} modalVisible={modificarReservaModal}
+                    reserva={selectedReservaObj}
+                />
+            </View>
             <View >
                 <Text> {item.fecha.substring(0, 10)} desde {item.horaInicioCadena} hasta {item.horaFinCadena}</Text>
                 { item.idReserva && <Text>{item.idCliente.nombreCompleto}</Text>}
@@ -68,8 +77,9 @@ export default ({reservasList, setError, getReservas, idCliente}) => {
                     color="red"/> 
                 <Button 
                     style={styles.botonModificar}
-                    onPress={() => modificarReserva(item.idReserva)}
+                    onPress={() => modificarReserva(item)}
                     title="Modificar"
+                    disabled={item.fechaCadena < strDate}
                 color="grey"/> 
             </View>: 
             <Button 
@@ -105,5 +115,8 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         justifyContent: 'space-evenly',
         alignItems:'stretch'
+    },
+    modal: {
+        width: 0,
     }
 });
