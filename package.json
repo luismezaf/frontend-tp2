@@ -15,6 +15,7 @@
     "react-native": "0.66.2",
     "react-native-big-list": "^1.4.3",
     "react-native-date-picker": "^4.1.1",
+    "react-native-elements": "^3.4.2",
     "react-native-table-component": "^1.2.1",
     "react-router-native": "^6.0.0"
   },

@@ -57,7 +57,8 @@ const styles = StyleSheet.create({
     },
     content:{
         flexGrow: 1,
-        display: 'flex'
+        display: 'flex',
+        maxHeight:'94%'
     },
     footer:{
         display: "flex",

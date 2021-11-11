@@ -12,17 +12,23 @@ import {
     FlatList,
     Pressable
 } from 'react-native';
+import { FAB } from 'react-native-elements';
 import {Picker} from '@react-native-picker/picker';
 import DatePicker from 'react-native-date-picker';
 
 import {endpoint} from '../config/api';
-
+import PacienteItem from '../components/PacienteItem';
+import PacienteForm from '../components/PacienteForm';
+import PacienteSearch from '../components/PacienteSearch';
 
 
 export default () => {
     const [pacientesList, setPacientesList] = useState([]);
-    const [selectedFisio, setSelectedFisio] = useState(0);
-    const [date, setDate] = useState( new Date() );
+    const [pacientesListFiltered, setPacientesListFiltered] = useState([]);
+    const [selectedPacienteObj, setSelectedPacienteObj] = useState(null);
+    const [pacienteModal, setPacienteModal] = useState(false);
+    const [pacienteFormModal, setPacienteFormModal] = useState(false);
+    const [query, setQuery] = useState('');
     const [error, setError] = useState(null);
     useEffect(()=>{
         const getPacientesData = async () => {
@@ -30,6 +36,7 @@ export default () => {
             try {
                 const data =  await fetch(`${endpoint}/stock-nutrinatalia/persona`);
                 const res = await data.json();
+                setPacientesListFiltered(res.lista)
                 setPacientesList(res.lista);
             
             } catch (error) {
@@ -38,41 +45,97 @@ export default () => {
                 
             }
         }
-        getPacientesData();
-    });
-  
-    const handlePress = (paciente) => {
-        console.log(paciente.nombre);
-    };
 
+        getPacientesData();
+    },[]);
+     useEffect(()=>{
+        handleSearch(query);
+     },[query]);
+
+     const getPacientesData = async () => {
+            
+        try {
+            const data =  await fetch(`${endpoint}/stock-nutrinatalia/persona`);
+            const res = await data.json();
+            setPacientesList(res.lista);
+        
+        } catch (error) {
+            console.log(error);
+            setError(error);
+            
+        }
+    }
+    const getPaciente = async(paciente) => {
+        setSelectedPacienteObj(paciente);
+        setPacienteModal(true);
+    }
+
+    const createPaciente = async() => {
+
+        setPacienteFormModal(true);
+    }
+
+    const handleSearch = (query) => {
+        
+        const pacientesFiltered = pacientesList.filter((paciente) => {
+        return (
+            paciente.nombre.toLowerCase().includes(query.toLowerCase())
+        );
+        });
+        setPacientesListFiltered(pacientesFiltered);
+  };
  
     return(
-         <View style={styles.container, styles.row}>
+         <View style={styles.container}>
+             <View style={{position:"absolute", top:0, width:"100%"}} >
+                <PacienteSearch onChange={handleSearch} query={query} setQuery={setQuery} />
+        
 
+             </View>
+            
+
+           
+            <View style={styles.modal}>
+                <PacienteItem setModalVisible={setPacienteModal} modalVisible={pacienteModal}
+                    paciente={selectedPacienteObj}
+                />
+                <PacienteForm setModalFormVisible={setPacienteFormModal} modalFormVisible={pacienteFormModal}
+                    getPacientes={getPacientesData}
+                />
+                
+            </View>
             <FlatList
-            data={pacientesList}
+            data={pacientesListFiltered}
             renderItem={({item}) => (
-                <Pressable onPress={()=>{handlePress(item)}} style={styles.containerPressable}>
+                <Pressable onPress={()=>{getPaciente(item)}} style={styles.containerPressable}>
 
                     <View style={styles.row}>
                         <Text style={styles.symbolText}>{item.cedula}</Text>
-                        <Text style={styles.nameText}>{item.nombre}</Text>
-                        <Text style={styles.priceText}>{item.apellido}</Text>
                     </View>
 
-                    <View style={styles.row}>
-                        <Text style={styles.percentText}>{item.tipoPersona}</Text>
+                    <View style={styles.row} center>
+                        <Text style={styles.nameText}>{item.nombreCompleto}</Text>
+
                     
                     </View>
-
+                    <View style={styles.row}>
+                        <Text style={styles.percentText}>{item.tipoPersona}</Text>
+                    </View>
                 </Pressable>
             )}
         />
+
+                <FAB style={{marginBottom:50}} title="+" placement="right" color="orange" onPress={createPaciente} />
       </View>
+        
     );
 }
 
 const styles = StyleSheet.create({
+        container:{
+            position:"relative",
+            top:0
+        },
         filtersSection:{
             marginLeft:"auto",
             marginRight:"auto"
@@ -112,10 +175,13 @@ const styles = StyleSheet.create({
         containerPressable: {
             flexDirection: "row",
             justifyContent: "space-between",
-            padding: 5,
+            padding: 16,
             borderBottomColor: "orange",
             borderBottomWidth: 1,
             paddingLeft: Platform.OS == 'ios' ? 0 : 16,
             marginLeft: Platform.OS == 'ios' ? 16 : 0
         },
+        modal: {
+            width: 0,
+        }
 });
