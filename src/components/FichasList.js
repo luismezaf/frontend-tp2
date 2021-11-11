@@ -18,7 +18,7 @@ export default function FichasList(props){
 
     const {fichas}=props;
     return(
-
+        <View style={{ height:150 }} >
             <FlatList
                 data={fichas}
                 numColumns={2}
@@ -26,6 +26,7 @@ export default function FichasList(props){
                 renderItem={({item})=> <FichasCard ficha = {item} />}
                 contentContainerStyle={styles.FlatListContentContainer}
             />
+          </View>
         );
 }
 
